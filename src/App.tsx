@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Analytics } from "@/components/Analytics";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -42,6 +42,9 @@ const App = () => (
           <BrowserRouter>
             <Analytics />
             <Routes>
+              {/* Redirects */}
+              <Route path="/home" element={<Navigate to="/" replace />} />
+              
               {/* Public routes */}
               <Route path="/" element={<Index />} />
               <Route path="/services" element={<Services />} />
@@ -58,6 +61,7 @@ const App = () => (
               
               {/* Admin routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/posts" element={<PostList />} />
               <Route path="/admin/posts/new" element={<PostForm />} />
