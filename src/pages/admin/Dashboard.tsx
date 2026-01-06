@@ -26,6 +26,12 @@ export default function AdminDashboard() {
 
   const loadData = async () => {
     try {
+      if (!supabase) {
+        console.error("Supabase is not available");
+        setLoading(false);
+        return;
+      }
+
       // Load posts stats
       const { data: allPosts } = await supabase.from("blog_posts").select("id, published");
       const { data: publishedPosts } = await supabase

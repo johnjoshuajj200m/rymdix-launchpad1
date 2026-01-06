@@ -32,6 +32,12 @@ export default function PostList() {
 
   const loadPosts = async () => {
     try {
+      if (!supabase) {
+        toast.error("Supabase is not available. Please check your configuration.");
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("blog_posts")
         .select("*")

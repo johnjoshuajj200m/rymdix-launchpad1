@@ -18,6 +18,12 @@ export default function Analytics() {
 
   const loadLeads = async () => {
     try {
+      if (!supabase) {
+        console.error("Supabase is not available");
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("leads")
         .select("*")

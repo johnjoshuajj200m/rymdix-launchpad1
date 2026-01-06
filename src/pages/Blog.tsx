@@ -18,6 +18,12 @@ export default function Blog() {
 
   const loadPosts = async () => {
     try {
+      if (!supabase) {
+        setError("Blog posts are temporarily unavailable. Please check back later.");
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from("blog_posts")
         .select("*")

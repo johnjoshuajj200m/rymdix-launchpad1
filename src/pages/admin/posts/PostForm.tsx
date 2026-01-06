@@ -44,6 +44,12 @@ export default function PostForm() {
 
   const loadPost = async () => {
     try {
+      if (!supabase) {
+        toast.error("Supabase is not available. Please check your configuration.");
+        navigate("/admin/posts");
+        return;
+      }
+
       const { data, error } = await supabase
         .from("blog_posts")
         .select("*")
@@ -81,6 +87,12 @@ export default function PostForm() {
     setLoading(true);
 
     try {
+      if (!supabase) {
+        toast.error("Supabase is not available. Please check your configuration.");
+        setLoading(false);
+        return;
+      }
+
       // Check if slug is unique
       const { data: existing } = await supabase
         .from("blog_posts")

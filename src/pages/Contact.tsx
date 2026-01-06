@@ -41,6 +41,14 @@ export default function Contact() {
     setError(null);
 
     try {
+      if (!supabase) {
+        // If Supabase is not available, still show success but log a warning
+        console.warn("Supabase not available, form submission not saved to database");
+        setIsSubmitted(true);
+        setLoading(false);
+        return;
+      }
+
       const { error: insertError } = await supabase
         .from("leads")
         .insert({

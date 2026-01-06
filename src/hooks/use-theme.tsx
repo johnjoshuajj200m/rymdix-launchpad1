@@ -11,15 +11,34 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
-    const stored = localStorage.getItem("rymdix-theme");
-    return (stored as Theme) || "dark";
+    // Safe localStorage access with try-catch
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        const stored = localStorage.getItem("rymdix-theme");
+        if (stored === "dark" || stored === "light") {
+          return stored as Theme;
+        }
+      }
+    } catch (error) {
+      console.warn("Failed to read theme from localStorage:", error);
+    }
+    return "dark";
   });
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem("rymdix-theme", theme);
+    // Safe DOM and localStorage access
+    try {
+      if (typeof document !== "undefined") {
+        const root = document.documentElement;
+        root.classList.remove("light", "dark");
+        root.classList.add(theme);
+      }
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem("rymdix-theme", theme);
+      }
+    } catch (error) {
+      console.warn("Failed to update theme:", error);
+    }
   }, [theme]);
 
   const toggleTheme = () => {
