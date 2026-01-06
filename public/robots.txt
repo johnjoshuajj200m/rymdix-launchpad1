@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://rymdix.com/sitemap.xml
+
+# Disallow admin/internal paths if any
+Disallow: /admin/
+Disallow: /api/
