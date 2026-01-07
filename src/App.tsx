@@ -29,6 +29,8 @@ import PostForm from "./pages/admin/posts/PostForm";
 import AdminAnalytics from "./pages/admin/Analytics";
 import Leads from "./pages/admin/Leads";
 import Settings from "./pages/admin/Settings";
+import ServiceList from "./pages/admin/services/ServiceList";
+import ServiceForm from "./pages/admin/services/ServiceForm";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +70,9 @@ const App = () => (
               <Route path="/admin/posts/edit/:id" element={<PostForm />} />
               <Route path="/admin/leads" element={<Leads />} />
               <Route path="/admin/analytics" element={<AdminAnalytics />} />
+              <Route path="/admin/services" element={<ServiceList />} />
+              <Route path="/admin/services/new" element={<ServiceForm />} />
+              <Route path="/admin/services/edit/:id" element={<ServiceForm />} />
               <Route path="/admin/settings" element={<Settings />} />
               
               <Route path="*" element={<NotFound />} />

@@ -3,17 +3,30 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Users, BarChart3, Eye } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ExternalLink, Users, BarChart3, Eye, Activity, AlertCircle, Loader2 } from "lucide-react";
 import { supabase, Lead } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
 
+interface GAMetrics {
+  activeUsers: number;
+  pageViews: number;
+  sessions: number;
+  events: number;
+  error?: string;
+}
+
 export default function Analytics() {
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [gaMetrics, setGaMetrics] = useState<GAMetrics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [gaLoading, setGaLoading] = useState(true);
+  const [gaError, setGaError] = useState<string | null>(null);
   const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
   useEffect(() => {
     loadLeads();
+    loadGAMetrics();
   }, []);
 
   const loadLeads = async () => {
@@ -39,6 +52,39 @@ export default function Analytics() {
     }
   };
 
+  const loadGAMetrics = async () => {
+    try {
+      setGaLoading(true);
+      setGaError(null);
+
+      const response = await fetch("/api/analytics");
+      const data: GAMetrics = await response.json();
+
+      if (data.error) {
+        setGaError(data.error);
+        setGaMetrics({
+          activeUsers: 0,
+          pageViews: 0,
+          sessions: 0,
+          events: 0,
+        });
+      } else {
+        setGaMetrics(data);
+      }
+    } catch (error: any) {
+      console.error("Error loading GA metrics:", error);
+      setGaError(error.message || "Failed to load analytics");
+      setGaMetrics({
+        activeUsers: 0,
+        pageViews: 0,
+        sessions: 0,
+        events: 0,
+      });
+    } finally {
+      setGaLoading(false);
+    }
+  };
+
   return (
     <ProtectedRoute>
       <AdminLayout>
@@ -48,57 +94,130 @@ export default function Analytics() {
             <p className="text-muted-foreground">View site metrics and contact form submissions</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{leads.length}</div>
-                <p className="text-xs text-muted-foreground">Contact form submissions</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Google Analytics</CardTitle>
-                <BarChart3 className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                {GA_MEASUREMENT_ID ? (
-                  <div>
-                    <div className="text-2xl font-bold">Connected</div>
-                    <p className="text-xs text-muted-foreground mb-2">Tracking ID: {GA_MEASUREMENT_ID}</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open("https://analytics.google.com", "_blank")}
-                      className="w-full"
+          {/* Google Analytics Metrics */}
+          {GA_MEASUREMENT_ID && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold">Google Analytics (Last 7 Days)</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Realtime data available in{" "}
+                    <a
+                      href="https://analytics.google.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline"
                     >
-                      Open Google Analytics <ExternalLink className="ml-2 h-3 w-3" />
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="text-2xl font-bold">Not Configured</div>
-                    <p className="text-xs text-muted-foreground">Set VITE_GA_MEASUREMENT_ID</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      Google Analytics
+                    </a>
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open("https://analytics.google.com", "_blank")}
+                >
+                  Open GA <ExternalLink className="ml-2 h-3 w-3" />
+                </Button>
+              </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Page Views</CardTitle>
-                <Eye className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">—</div>
-                <p className="text-xs text-muted-foreground">View in Google Analytics</p>
-              </CardContent>
-            </Card>
-          </div>
+              {gaError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{gaError}</AlertDescription>
+                </Alert>
+              )}
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                    <Activity className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    {gaLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold">
+                          {gaMetrics?.activeUsers.toLocaleString() || "0"}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Last 7 days</p>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Page Views</CardTitle>
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    {gaLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold">
+                          {gaMetrics?.pageViews.toLocaleString() || "0"}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Last 7 days</p>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Sessions</CardTitle>
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    {gaLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold">
+                          {gaMetrics?.sessions.toLocaleString() || "0"}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Last 7 days</p>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Events</CardTitle>
+                    <Activity className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    {gaLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : (
+                      <>
+                        <div className="text-2xl font-bold">
+                          {gaMetrics?.events.toLocaleString() || "0"}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Last 7 days</p>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+
+          {/* Leads Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Total Leads</CardTitle>
+              <CardDescription>Contact form submissions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{leads.length}</div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>

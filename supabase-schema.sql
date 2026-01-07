@@ -94,3 +94,5 @@ CREATE TRIGGER update_blog_posts_updated_at
   EXECUTE FUNCTION update_updated_at_column();
 
 
+
+

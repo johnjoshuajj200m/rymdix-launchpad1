@@ -1,25 +1,15 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Code, Globe, Bot, LineChart, ArrowRight } from "lucide-react";
 import serviceCustomSoftware from "@/assets/services/custom-software.jpg";
 import serviceWebApp from "@/assets/services/web-apps.jpg";
 import serviceAiAutomation from "@/assets/services/ai-automation.jpg";
 import serviceSalesOps from "@/assets/services/sales-ops.jpg";
+import { supabase, Service } from "@/lib/supabase";
+import { getIcon } from "@/utils/iconMapper";
 
-// Diagnostic logging to verify imports resolve to URLs
-console.log("ServicesGrid image imports:", {
-  customSoftware: serviceCustomSoftware,
-  webApps: serviceWebApp,
-  aiAutomation: serviceAiAutomation,
-  salesOps: serviceSalesOps,
-});
-
-// Log each image path individually
-console.log("Custom Software image path:", serviceCustomSoftware);
-console.log("Web Apps image path:", serviceWebApp);
-console.log("AI Automation image path:", serviceAiAutomation);
-console.log("Sales Ops image path:", serviceSalesOps);
-
-const services = [
+// Fallback services if Supabase is unavailable
+const fallbackServices = [
   {
     icon: Code,
     title: "Custom Software Development",
@@ -55,6 +45,71 @@ const services = [
 ];
 
 export function ServicesGrid() {
+  const [services, setServices] = useState(fallbackServices);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadServices();
+  }, []);
+
+  const loadServices = async () => {
+    try {
+      if (!supabase) {
+        setServices(fallbackServices);
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .eq("published", true)
+        .order("sort_order", { ascending: true });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const mappedServices = data.map((service: Service) => {
+          const Icon = getIcon(service.icon_name);
+          const imageUrl = service.image_url || 
+            (service.slug.includes("custom-software") ? serviceCustomSoftware :
+             service.slug.includes("web-application") ? serviceWebApp :
+             service.slug.includes("ai-workflow") ? serviceAiAutomation :
+             service.slug.includes("sales-operations") ? serviceSalesOps :
+             serviceCustomSoftware);
+
+          return {
+            icon: Icon,
+            title: service.title,
+            description: service.summary,
+            href: `/services/${service.slug}`,
+            image: imageUrl,
+            alt: `${service.title} - ${service.summary}`,
+          };
+        });
+        setServices(mappedServices);
+      } else {
+        // Use fallback if no services in database
+        setServices(fallbackServices);
+      }
+    } catch (error) {
+      console.error("Error loading services:", error);
+      // Use fallback on error
+      setServices(fallbackServices);
+    } finally {
+      setLoading(false);
+    }
+  };
+  if (loading) {
+    return (
+      <section className="py-24">
+        <div className="container">
+          <div className="text-center text-muted-foreground">Loading services...</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-24">
       <div className="container">

@@ -62,3 +62,18 @@ export interface Lead {
   created_at: string;
 }
 
+export interface Service {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  description: string | null;
+  bullets: string[] | null;
+  icon_name: string;
+  image_url: string | null;
+  published: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+

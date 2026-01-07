@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/hooks/use-theme";
 import {
@@ -28,7 +29,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LayoutDashboard, FileText, Users, BarChart3, Settings, LogOut, Moon, Sun, Search } from "lucide-react";
+import { LayoutDashboard, FileText, Users, BarChart3, Settings, LogOut, Moon, Sun, Search, Package } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 interface AdminLayoutProps {
@@ -45,6 +46,11 @@ const menuItems = [
     title: "Posts",
     icon: FileText,
     href: "/admin/posts",
+  },
+  {
+    title: "Services",
+    icon: Package,
+    href: "/admin/services",
   },
   {
     title: "Leads",
@@ -70,8 +76,24 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { theme, toggleTheme } = useTheme();
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/admin/login", { replace: true });
+    try {
+      await signOut();
+      // Clear any local state
+      if (typeof window !== "undefined") {
+        // Clear Supabase auth keys from localStorage
+        const keys = Object.keys(localStorage);
+        keys.forEach((key) => {
+          if (key.startsWith("sb-") || key.includes("supabase")) {
+            localStorage.removeItem(key);
+          }
+        });
+      }
+      navigate("/admin/login", { replace: true });
+    } catch (error) {
+      console.error("Error signing out:", error);
+      // Still redirect even if signOut fails
+      navigate("/admin/login", { replace: true });
+    }
   };
 
   const userInitials = user?.email
@@ -81,6 +103,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <SidebarProvider>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       <div className="flex min-h-screen w-full">
         <Sidebar variant="inset" collapsible="icon">
           <SidebarHeader className="border-b border-sidebar-border">
@@ -160,6 +185,16 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <Moon className="h-4 w-4" />
                 )}
               </Button>
+              {/* Logout Button - Always Visible */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
               {/* Profile Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -180,11 +215,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                       </p>
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Logout
-                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
