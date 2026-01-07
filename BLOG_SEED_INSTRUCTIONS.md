@@ -75,3 +75,4 @@ To add cover images later:
 2. Edit posts in admin dashboard
 3. Add image URL to `cover_image_url` field
 
+

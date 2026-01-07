@@ -48,3 +48,4 @@ CREATE TRIGGER update_services_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_services_updated_at();
 
+

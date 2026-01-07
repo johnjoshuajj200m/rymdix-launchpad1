@@ -37,3 +37,4 @@ export function Logo({ variant = "default", className = "", showLink = true }: L
   return logoContent;
 }
 
+

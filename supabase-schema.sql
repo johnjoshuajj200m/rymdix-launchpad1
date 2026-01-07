@@ -96,3 +96,4 @@ CREATE TRIGGER update_blog_posts_updated_at
 
 
 
+

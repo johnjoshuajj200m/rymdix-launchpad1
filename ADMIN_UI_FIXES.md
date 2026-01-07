@@ -197,3 +197,4 @@
 - Verify environment variables are set
 - Check Supabase dashboard for table existence
 
+

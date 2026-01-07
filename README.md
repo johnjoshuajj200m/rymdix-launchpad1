@@ -1,73 +1,134 @@
-# Welcome to your Lovable project
+# Rymdix Technologies
 
-## Project info
+Official website and admin dashboard for Rymdix Technologies - a custom software development company specializing in web applications, workflow automation, and AI-powered business systems.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Overview
 
-## How can I edit this code?
+This is the production website for Rymdix Technologies, featuring:
 
-There are several ways of editing your application.
+- **Public Website**: Marketing site with services, case studies, blog, and contact forms
+- **Admin Dashboard**: Content management system for blog posts, services, leads, and analytics
+- **Blog System**: SEO-optimized blog with Supabase backend
+- **Analytics Integration**: Google Analytics tracking and admin analytics dashboard
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite 5
+- **Styling**: Tailwind CSS + shadcn/ui components
+- **Routing**: React Router v6
+- **Backend**: Supabase (PostgreSQL, Auth, Storage)
+- **Deployment**: Vercel
+- **Analytics**: Google Analytics 4
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js 18+ and npm
+- Supabase account and project
+- Vercel account (for deployment)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd rymdix-launchpad-1
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+2. Install dependencies:
+```bash
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+3. Set up environment variables:
+Create a `.env` file in the root directory:
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_GA_MEASUREMENT_ID=your_ga_measurement_id
+VITE_CALENDLY_URL=your_calendly_url
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Run the development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The site will be available at `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Development
 
-**Use GitHub Codespaces**
+### Available Scripts
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint
 
-## What technologies are used for this project?
+### Project Structure
 
-This project is built with:
+```
+src/
+├── components/       # Reusable React components
+│   ├── admin/       # Admin dashboard components
+│   ├── layout/      # Layout components (Navbar, Footer)
+│   ├── sections/    # Homepage sections
+│   └── ui/          # shadcn/ui components
+├── pages/           # Page components
+│   ├── admin/       # Admin dashboard pages
+│   └── services/    # Service detail pages
+├── lib/             # Utilities and Supabase client
+├── config/          # Configuration constants
+└── contexts/        # React contexts (Auth, etc.)
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Database Setup
 
-## How can I deploy this project?
+The application uses Supabase for data storage. Run the following SQL files in your Supabase SQL Editor:
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+1. `supabase-schema.sql` - Creates blog_posts and leads tables
+2. `supabase-services-schema.sql` - Creates services table
+3. `supabase-blog-seed.sql` - Optional: Seed 4 initial blog posts
 
-## Can I connect a custom domain to my Lovable project?
+## Deployment
 
-Yes, you can!
+### Vercel Deployment
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Connect your repository to Vercel
+2. Configure environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+The `vercel.json` file configures:
+- SPA routing (all routes → `/index.html`)
+- Filesystem-first routing for static assets
+
+### Environment Variables (Vercel)
+
+Set these in Vercel project settings:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_GA_MEASUREMENT_ID`
+- `VITE_CALENDLY_URL`
+
+## Features
+
+### Public Website
+- Responsive homepage with services, case studies, and blog preview
+- Service detail pages
+- Blog with SEO optimization
+- Contact form with Calendly integration
+- Google Analytics tracking
+
+### Admin Dashboard
+- Authentication via Supabase
+- Blog post management (CRUD)
+- Services management (CRUD)
+- Leads management
+- Analytics dashboard (Google Analytics integration)
+- Settings page
+
+## License
+
+Proprietary - © Rymdix Technologies
