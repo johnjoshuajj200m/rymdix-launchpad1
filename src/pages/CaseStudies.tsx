@@ -80,6 +80,10 @@ export default function CaseStudies() {
                       src={study.image} 
                       alt={`${study.title} dashboard mockup - ${study.subtitle}`}
                       className="aspect-video h-full w-full object-cover lg:aspect-auto"
+                      loading="lazy"
+                      decoding="async"
+                      width={800}
+                      height={450}
                     />
                   </div>
                   <div className="p-8 lg:col-span-3 lg:p-12">

@@ -96,6 +96,10 @@ export default function Blog() {
                       src={post.cover_image_url || blogCoverDefault} 
                       alt={`${post.title} - blog article cover`}
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                      width={800}
+                      height={450}
                     />
                   </div>
                   <div className="flex flex-1 flex-col p-6">

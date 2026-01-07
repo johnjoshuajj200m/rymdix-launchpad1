@@ -6,7 +6,7 @@ import heroBg from "@/assets/hero-bg.jpg";
 export function HeroSection() {
   return (
     <section className="relative min-h-[90vh] overflow-hidden">
-      {/* Background image */}
+      {/* Background image - LCP element */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroBg})` }}

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/hooks/use-theme";
+import { Logo } from "@/components/brand/Logo";
 import {
   Sidebar,
   SidebarContent,
@@ -110,11 +111,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <Sidebar variant="inset" collapsible="icon">
           <SidebarHeader className="border-b border-sidebar-border">
             <div className="flex items-center gap-2 px-2 py-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
-                <span className="text-sm font-bold text-white">R</span>
-              </div>
-              <span className="text-lg font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-                Rymdix Admin
+              <Logo variant="compact" showLink={false} />
+              <span className="text-xs font-medium text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
+                Admin
               </span>
             </div>
           </SidebarHeader>

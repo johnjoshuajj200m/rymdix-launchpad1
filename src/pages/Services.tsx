@@ -131,6 +131,9 @@ export default function Services() {
                       alt={`${service.title} - ${service.description.substring(0, 60)}...`}
                       className="absolute inset-0 h-full w-full object-cover"
                       loading="lazy"
+                      decoding="async"
+                      width={800}
+                      height={450}
                       onError={(e) => {
                         console.error(`Failed to load image for ${service.title}:`, service.image);
                       }}

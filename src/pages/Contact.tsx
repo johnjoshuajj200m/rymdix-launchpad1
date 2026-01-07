@@ -16,6 +16,7 @@ import { Mail, MessageCircle, Calendar, Check, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { CalendlyEmbed } from "@/components/CalendlyEmbed";
 
 const WHATSAPP_LINK = "https://wa.me/2348100909043";
 const PRIMARY_EMAIL = "contact@rymdix.com";
@@ -286,17 +287,17 @@ export default function Contact() {
                   <Calendar className="h-6 w-6" />
                 </div>
                 <h3 className="mb-2 text-xl font-semibold">Book a Call</h3>
-                <p className="mb-6 text-muted-foreground">
+                <p className="mb-4 text-muted-foreground">
                   Schedule a free 30-minute discovery call to discuss your project and see if we're a good fit.
                 </p>
-                <div className="rounded-xl border border-dashed border-border bg-secondary/20 p-8 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    📅 Calendly embed placeholder
-                  </p>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    (Connect Calendly to enable scheduling)
-                  </p>
+                <div className="mb-4 flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                  <span>Usually responds within 1-6 hours</span>
                 </div>
+                <CalendlyEmbed className="w-full" />
+                <p className="mt-4 text-xs text-muted-foreground text-center">
+                  Can't find a time? <a href={`mailto:${PRIMARY_EMAIL}`} className="text-primary hover:underline">Email us</a> to schedule.
+                </p>
               </div>
               
               {/* Email */}

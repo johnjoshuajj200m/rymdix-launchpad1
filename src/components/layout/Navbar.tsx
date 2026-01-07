@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
+import { Logo } from "@/components/brand/Logo";
 
 const navLinks = [
   { href: "/services", label: "Services" },
@@ -20,12 +21,7 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <nav className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-primary">
-            <span className="text-sm font-bold text-white">R</span>
-          </div>
-          <span className="text-lg font-semibold text-foreground">Rymdix</span>
-        </Link>
+        <Logo />
 
         {/* Desktop Navigation */}
         <div className="hidden items-center gap-1 md:flex">

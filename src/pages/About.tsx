@@ -71,6 +71,10 @@ export default function About() {
                 src={aboutVisual} 
                 alt="Rymdix Technologies - interconnected systems visualization"
                 className="aspect-square w-full object-cover"
+                loading="lazy"
+                decoding="async"
+                width={800}
+                height={800}
               />
             </div>
           </div>

@@ -34,6 +34,22 @@ export function CTASection() {
               </Button>
             </a>
           </div>
+          
+          {/* Trust Signals */}
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+              <span>Response within 24 hours</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+              <span>Secure & confidential</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-1.5 rounded-full bg-green-500" />
+              <span>No commitment required</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
