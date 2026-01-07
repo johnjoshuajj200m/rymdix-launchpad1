@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExternalLink, Users, BarChart3, Eye, Activity, AlertCircle, Loader2 } from "lucide-react";
+import { ExternalLink, Users, BarChart3, Eye, Activity, AlertCircle, Loader2, Bug } from "lucide-react";
 import { supabase, Lead } from "@/lib/supabase";
 import { Badge } from "@/components/ui/badge";
 
@@ -22,6 +20,8 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [gaLoading, setGaLoading] = useState(true);
   const [gaError, setGaError] = useState<string | null>(null);
+  const [showDebug, setShowDebug] = useState(false);
+  const [rawResponse, setRawResponse] = useState<any>(null);
   const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
   useEffect(() => {
@@ -57,10 +57,26 @@ export default function Analytics() {
       setGaLoading(true);
       setGaError(null);
 
+      console.log("[Analytics] Fetching from /api/analytics...");
       const response = await fetch("/api/analytics");
+      
+      console.log("[Analytics] Response status:", response.status, response.statusText);
+      console.log("[Analytics] Response ok:", response.ok);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("[Analytics] Response not OK. Status:", response.status, "Body:", errorText);
+        throw new Error(`API returned ${response.status}: ${errorText.substring(0, 100)}`);
+      }
+
       const data: GAMetrics = await response.json();
+      console.log("[Analytics] Parsed JSON data:", data);
+
+      // Store raw response for debugging
+      setRawResponse(data);
 
       if (data.error) {
+        console.error("[Analytics] API returned error:", data.error);
         setGaError(data.error);
         setGaMetrics({
           activeUsers: 0,
@@ -69,11 +85,23 @@ export default function Analytics() {
           events: 0,
         });
       } else {
+        console.log("[Analytics] Successfully loaded metrics:", {
+          activeUsers: data.activeUsers,
+          pageViews: data.pageViews,
+          sessions: data.sessions,
+          events: data.events,
+        });
         setGaMetrics(data);
       }
     } catch (error: any) {
-      console.error("Error loading GA metrics:", error);
-      setGaError(error.message || "Failed to load analytics");
+      console.error("[Analytics] Fetch failed:", error);
+      console.error("[Analytics] Error details:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      });
+      setGaError(error.message || "Failed to load analytics. Check that /api/analytics endpoint exists.");
+      setRawResponse({ error: error.message });
       setGaMetrics({
         activeUsers: 0,
         pageViews: 0,
@@ -82,13 +110,12 @@ export default function Analytics() {
       });
     } finally {
       setGaLoading(false);
+      console.log("[Analytics] Loading complete");
     }
   };
 
   return (
-    <ProtectedRoute>
-      <AdminLayout>
-        <div className="space-y-6">
+    <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
             <p className="text-muted-foreground">View site metrics and contact form submissions</p>
@@ -112,20 +139,57 @@ export default function Analytics() {
                     </a>
                   </p>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open("https://analytics.google.com", "_blank")}
-                >
-                  Open GA <ExternalLink className="ml-2 h-3 w-3" />
-                </Button>
+                <div className="flex gap-2">
+                  {import.meta.env.DEV && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowDebug(!showDebug)}
+                    >
+                      <Bug className="h-3 w-3 mr-2" />
+                      Debug
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open("https://analytics.google.com", "_blank")}
+                  >
+                    Open GA <ExternalLink className="ml-2 h-3 w-3" />
+                  </Button>
+                </div>
               </div>
 
               {gaError && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{gaError}</AlertDescription>
+                  <AlertDescription>
+                    <div className="font-semibold mb-1">Error loading analytics:</div>
+                    <div>{gaError}</div>
+                    {gaError.includes("not configured") && (
+                      <div className="mt-2 text-xs">
+                        Set GA_PROPERTY_ID, GA_CLIENT_EMAIL, and GA_PRIVATE_KEY in Vercel environment variables.
+                      </div>
+                    )}
+                  </AlertDescription>
                 </Alert>
+              )}
+
+              {/* Debug Info (Dev Mode Only) */}
+              {import.meta.env.DEV && showDebug && rawResponse && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Bug className="h-4 w-4" />
+                      Debug: API Response
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <pre className="text-xs bg-muted p-4 rounded overflow-auto max-h-64">
+                      {JSON.stringify(rawResponse, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
               )}
 
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -137,10 +201,12 @@ export default function Analytics() {
                   <CardContent>
                     {gaLoading ? (
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : gaError ? (
+                      <div className="text-sm text-destructive">Error</div>
                     ) : (
                       <>
                         <div className="text-2xl font-bold">
-                          {gaMetrics?.activeUsers.toLocaleString() || "0"}
+                          {(gaMetrics?.activeUsers ?? 0).toLocaleString()}
                         </div>
                         <p className="text-xs text-muted-foreground">Last 7 days</p>
                       </>
@@ -156,10 +222,12 @@ export default function Analytics() {
                   <CardContent>
                     {gaLoading ? (
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : gaError ? (
+                      <div className="text-sm text-destructive">Error</div>
                     ) : (
                       <>
                         <div className="text-2xl font-bold">
-                          {gaMetrics?.pageViews.toLocaleString() || "0"}
+                          {(gaMetrics?.pageViews ?? 0).toLocaleString()}
                         </div>
                         <p className="text-xs text-muted-foreground">Last 7 days</p>
                       </>
@@ -175,10 +243,12 @@ export default function Analytics() {
                   <CardContent>
                     {gaLoading ? (
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : gaError ? (
+                      <div className="text-sm text-destructive">Error</div>
                     ) : (
                       <>
                         <div className="text-2xl font-bold">
-                          {gaMetrics?.sessions.toLocaleString() || "0"}
+                          {(gaMetrics?.sessions ?? 0).toLocaleString()}
                         </div>
                         <p className="text-xs text-muted-foreground">Last 7 days</p>
                       </>
@@ -194,10 +264,12 @@ export default function Analytics() {
                   <CardContent>
                     {gaLoading ? (
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    ) : gaError ? (
+                      <div className="text-sm text-destructive">Error</div>
                     ) : (
                       <>
                         <div className="text-2xl font-bold">
-                          {gaMetrics?.events.toLocaleString() || "0"}
+                          {(gaMetrics?.events ?? 0).toLocaleString()}
                         </div>
                         <p className="text-xs text-muted-foreground">Last 7 days</p>
                       </>
@@ -255,7 +327,5 @@ export default function Analytics() {
             </CardContent>
           </Card>
         </div>
-      </AdminLayout>
-    </ProtectedRoute>
   );
 }

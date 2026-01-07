@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -78,9 +76,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <ProtectedRoute>
-      <AdminLayout>
-        <div className="space-y-6">
+    <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground">Overview of your content and leads</p>
@@ -236,7 +232,5 @@ export default function AdminDashboard() {
             </Card>
           </div>
         </div>
-      </AdminLayout>
-    </ProtectedRoute>
   );
 }

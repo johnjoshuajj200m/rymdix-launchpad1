@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -140,9 +138,7 @@ export default function PostForm() {
   };
 
   return (
-    <ProtectedRoute>
-      <AdminLayout>
-        <div className="space-y-6">
+    <div className="space-y-6">
           <div>
             <Button variant="ghost" onClick={() => navigate("/admin/posts")} className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -238,7 +234,5 @@ export default function PostForm() {
             </Card>
           </form>
         </div>
-      </AdminLayout>
-    </ProtectedRoute>
   );
 }

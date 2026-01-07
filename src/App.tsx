@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 
 // Admin routes
 import AdminLogin from "./pages/admin/Login";
+import { AdminRoutes } from "./components/admin/AdminRoutes";
 import AdminDashboard from "./pages/admin/Dashboard";
 import PostList from "./pages/admin/posts/PostList";
 import PostForm from "./pages/admin/posts/PostForm";
@@ -63,17 +64,19 @@ const App = () => (
               
               {/* Admin routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
-              <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/posts" element={<PostList />} />
-              <Route path="/admin/posts/new" element={<PostForm />} />
-              <Route path="/admin/posts/edit/:id" element={<PostForm />} />
-              <Route path="/admin/leads" element={<Leads />} />
-              <Route path="/admin/analytics" element={<AdminAnalytics />} />
-              <Route path="/admin/services" element={<ServiceList />} />
-              <Route path="/admin/services/new" element={<ServiceForm />} />
-              <Route path="/admin/services/edit/:id" element={<ServiceForm />} />
-              <Route path="/admin/settings" element={<Settings />} />
+              <Route path="/admin" element={<AdminRoutes />}>
+                <Route index element={<Navigate to="/admin/dashboard" replace />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="posts" element={<PostList />} />
+                <Route path="posts/new" element={<PostForm />} />
+                <Route path="posts/edit/:id" element={<PostForm />} />
+                <Route path="services" element={<ServiceList />} />
+                <Route path="services/new" element={<ServiceForm />} />
+                <Route path="services/edit/:id" element={<ServiceForm />} />
+                <Route path="leads" element={<Leads />} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
               
               <Route path="*" element={<NotFound />} />
             </Routes>

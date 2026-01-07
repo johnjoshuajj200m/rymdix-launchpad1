@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -203,9 +201,7 @@ export default function ServiceForm() {
   };
 
   return (
-    <ProtectedRoute>
-      <AdminLayout>
-        <div className="space-y-6">
+    <div className="space-y-6">
           <div>
             <Button variant="ghost" onClick={() => navigate("/admin/services")} className="mb-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -355,8 +351,6 @@ export default function ServiceForm() {
             </Card>
           </form>
         </div>
-      </AdminLayout>
-    </ProtectedRoute>
   );
 }
 

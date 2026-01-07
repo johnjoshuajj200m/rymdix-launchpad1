@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -40,11 +38,21 @@ export default function ServiceList() {
         .select("*")
         .order("sort_order", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        // Check for common Supabase errors
+        if (error.message.includes("relation") && error.message.includes("does not exist")) {
+          toast.error("Supabase table 'services' not found. Run supabase-services-schema.sql in Supabase dashboard.");
+        } else if (error.message.includes("permission denied") || error.message.includes("RLS")) {
+          toast.error("Permission denied. Check RLS policies in Supabase.");
+        } else {
+          toast.error(`Failed to load services: ${error.message}`);
+        }
+        throw error;
+      }
       setServices(data || []);
     } catch (error) {
       console.error("Error loading services:", error);
-      toast.error("Failed to load services");
+      // Error already shown in toast above
     } finally {
       setLoading(false);
     }
@@ -126,9 +134,7 @@ export default function ServiceList() {
   };
 
   return (
-    <ProtectedRoute>
-      <AdminLayout>
-        <div className="space-y-6">
+    <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Services</h1>
@@ -170,9 +176,16 @@ export default function ServiceList() {
                 <div className="text-center py-12 text-muted-foreground">Loading services...</div>
               ) : filteredServices.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-muted-foreground mb-4">No services found</p>
+                  <p className="text-muted-foreground mb-4">
+                    {searchQuery 
+                      ? "No services match your search" 
+                      : "No services yet. Create your first one to get started."}
+                  </p>
                   <Link to="/admin/services/new">
-                    <Button>Create Your First Service</Button>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Your First Service
+                    </Button>
                   </Link>
                 </div>
               ) : (
@@ -287,8 +300,6 @@ export default function ServiceList() {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-      </AdminLayout>
-    </ProtectedRoute>
   );
 }
 

@@ -1,5 +1,3 @@
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +12,7 @@ export default function Settings() {
   const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 
   return (
-    <ProtectedRoute>
-      <AdminLayout>
-        <div className="space-y-6">
+    <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
             <p className="text-muted-foreground">Manage your admin settings and configuration</p>
@@ -107,8 +103,6 @@ export default function Settings() {
             </CardContent>
           </Card>
         </div>
-      </AdminLayout>
-    </ProtectedRoute>
   );
 }
 

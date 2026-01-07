@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
@@ -44,7 +42,15 @@ export default function Leads() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        // Check for common Supabase errors
+        if (error.message.includes("relation") && error.message.includes("does not exist")) {
+          console.error("Supabase table 'leads' not found. Run schema SQL in Supabase dashboard.");
+        } else if (error.message.includes("permission denied") || error.message.includes("RLS")) {
+          console.error("Permission denied. Check RLS policies in Supabase.");
+        }
+        throw error;
+      }
       setLeads(data || []);
     } catch (error) {
       console.error("Error loading leads:", error);
@@ -70,9 +76,7 @@ export default function Leads() {
   };
 
   return (
-    <ProtectedRoute>
-      <AdminLayout>
-        <div className="space-y-6">
+    <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Leads</h1>
             <p className="text-muted-foreground">Contact form submissions</p>
@@ -210,8 +214,6 @@ export default function Leads() {
             </DialogContent>
           </Dialog>
         </div>
-      </AdminLayout>
-    </ProtectedRoute>
   );
 }
 

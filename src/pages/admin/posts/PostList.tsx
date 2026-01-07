@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { ProtectedRoute } from "@/components/admin/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,11 +41,21 @@ export default function PostList() {
         .select("*")
         .order("updated_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        // Check for common Supabase errors
+        if (error.message.includes("relation") && error.message.includes("does not exist")) {
+          toast.error("Supabase table 'blog_posts' not found. Run schema SQL in Supabase dashboard.");
+        } else if (error.message.includes("permission denied") || error.message.includes("RLS")) {
+          toast.error("Permission denied. Check RLS policies in Supabase.");
+        } else {
+          toast.error(`Failed to load posts: ${error.message}`);
+        }
+        throw error;
+      }
       setPosts(data || []);
     } catch (error) {
       console.error("Error loading posts:", error);
-      toast.error("Failed to load posts");
+      // Error already shown in toast above
     } finally {
       setLoading(false);
     }
@@ -106,9 +114,7 @@ export default function PostList() {
   };
 
   return (
-    <ProtectedRoute>
-      <AdminLayout>
-        <div className="space-y-6">
+    <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Blog Posts</h1>
@@ -162,9 +168,16 @@ export default function PostList() {
                 <div className="text-center py-12 text-muted-foreground">Loading posts...</div>
               ) : filteredPosts.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-muted-foreground mb-4">No posts found</p>
+                  <p className="text-muted-foreground mb-4">
+                    {searchQuery || publishedFilter !== "all" 
+                      ? "No posts match your filters" 
+                      : "No posts yet. Create your first one to get started."}
+                  </p>
                   <Link to="/admin/posts/new">
-                    <Button>Create Your First Post</Button>
+                    <Button>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Your First Post
+                    </Button>
                   </Link>
                 </div>
               ) : (
@@ -258,7 +271,5 @@ export default function PostList() {
             </AlertDialogContent>
           </AlertDialog>
         </div>
-      </AdminLayout>
-    </ProtectedRoute>
   );
 }
